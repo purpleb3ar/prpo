@@ -269,12 +269,12 @@ needed to facilitate efficient and correct multi-service, multi-instance deploym
 
 - `queue groups`: essentially a way to group multiple instances of the same service together in order to enable efficient load-balancing of events.
 - `durable subscription`: essentially a way for services to not miss out
-  on events in case they go offline for brief amounts of time. On reconnect the missed events immediately redelivered instead.
+  on events in case they go offline for brief amounts of time. On reconnect the missed events are immediately redelivered instead.
 - `manual acknowledgement`: a way for the services to manually acknowledge an event in order to signal its successful processing and handling.
 
 This approach makes the microservices truly independent
 meaning that since there are no explicit dependencies,
-it can function even when all others are experiencing downtime.
+they can function even when all others are experiencing downtime.
 
 ## Cross-service data replication
 
@@ -300,19 +300,19 @@ To mitigate all the possible concurrency issues and other issues
 in event-based replication, we introduce a concept of `versioning` to our
 records.
 This means each instance of a resource has a version number (which starts with 0 at creation) and anytime this resource is updated though the SSOT the version is increased and send along with the replication event. When the interested service receives the event, it checks that the
-version of the record is only one less than the version in the event
-body. If it is the event is valid and it applies the update.
+version of the local record is only one less than the version in the event
+body. If it is, the update is applied, otherwise it is rejected.
 
-This allow the recipient to reject events if they arrived out-of-order.
+This allows the recipient to reject events if they arrived out-of-order.
 When they reject an event, there is a grace period that the `nats-streaming-server` waits until it tries to redeliver it.
 In this period the correct event arrives and the service happily applies it. Then the event is redelivered, the versions now match and it applies it as well. This is called eventual-consistency.
 
 We also introduce a concept of `optimistic concurrency control`. This is
 a method used in distributed systems which does not require locks.
 In a traditional system when a shared resource needs to be modified,
-the writer needs to lock it on order to prevent races.
+the writer needs to lock it in order to prevent data races.
 The OCC gets rid of locks and instead of prevetitavely locking
-the resource it instead relies on the version numbers
+the resource, relies on the version numbers
 to check whether the resource has changed after the fact.
 
 This is useful in the context of multiple instances of the same service
@@ -321,13 +321,10 @@ which share the database instance.
 Assume that the same event got delivered to two identical instances
 (something went wrong).
 
-Both services will check the version of the resource instance and see that it matches.
-
-They will load the resource into memory, change it based on the event,
-then try to write it back into the database.
+Both services will check the version of the local resource instance and see if it matches (lets assume it does). They will load the resource into memory, change it based on the event data and then try to write it back into the database.
 
 The OOC method used in context of `MongoDB` will check
-that the resource has not changed since it has been loaded.
+that the resource has not changed since it was loaded.
 This will prevent both events from being applied and version numbers
 from being incorrect, as one event will surely be rejected.
 
