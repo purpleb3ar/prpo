@@ -147,6 +147,30 @@ by looking at the contents of the `config` directory.
 
 ---
 
+### Minio
+
+In order for microservices to be able to access your local containerized
+minio instance, they will need correct credentials and a bucket. Follow
+the below steps to generate and apply them.
+
+1. Access the `Minio` management platform at `http://localhost:12001`
+2. Login using credentials found inside the `docker-compose.yml` file.
+3. Go to the `Buckets` tab under the `Administrator` section
+4. Click on the `Create Bucket` button in the top-right.
+5. Create a bucket named `puzzles`.
+6. Then go to the `Access Keys` tab under the `User` section
+7. Click on the `Create access key` button in the top-right.
+8. Click on the `Create` button.
+9. Copy the `Access Key` and `Secret Key`.
+
+Then go to the `puzzle` microservices `.env` file and replace
+the `<minio-access-key>` with your access key and the
+`<minio-secret-key>` with your secret key.
+
+Repeat this for the `processing` service and you are done.
+
+> **_NOTE_**: I omit creating an iam policy to limit access because I assume that this minio instance is local to this deployment.
+
 ## Usage
 
 ### Starting the backend services
@@ -169,7 +193,9 @@ Move into project root (the location where `docker-compose.yaml` resides) then:
    docker compose up -d
    ```
 2. Start the service
+   ```bash
    npm run start:dev
+   ```
 
 ---
 
@@ -223,6 +249,8 @@ The application follows a **microservices architecture**, ensuring scalability a
   - **Processing Server**: Turns user-provided images into solvable jigsaw puzzles.
 
 ---
+
+> **_NOTE_**: Specific information and technical details about each microservice is available inside a README.md file located in the microservices respective directries.
 
 ## Contributing
 

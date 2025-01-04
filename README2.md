@@ -1,7 +1,11 @@
 # Puzzle app
 
+## Overview
+
 A simple application which allows users to collaboratively
 solve jigsaw puzzles.
+
+## Features
 
 There are three main ways of interacting with the platform:
 
@@ -25,6 +29,12 @@ desires.
 
 User can create an account with username and password
 or simply sign in using Google SSO.
+
+## Features
+
+## Software
+
+Microservices are written in `Nest` using `TypeScript`.
 
 ## Architecture
 
