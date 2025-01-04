@@ -135,11 +135,47 @@ export class PuzzleService implements OnModuleInit {
     }
   }
 
+  async deletePuzzle(user: TokenPayload, id: string) {
+    const puzzle = await this.puzzleModel
+      .findOne({
+        _id: id,
+      })
+      .orFail(new HttpException('puzzle does not exist', HttpStatus.NOT_FOUND))
+      .populate('owner');
+
+    if (puzzle.visibility === Visibility.Public) {
+      throw new HttpException(
+        'public puzzles can not be removed',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (puzzle.owner.id !== user.id) {
+      throw new HttpException(
+        'only owned can delete puzzle',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    await puzzle.deleteOne();
+
+    // TODO: emit event notifying the sync service of this.
+
+    return null;
+  }
+
   async updatePuzzle(user: TokenPayload, id: string, data: UpdatePuzzleDto) {
     const puzzle = await this.puzzleModel
       .findById(id)
       .orFail(new HttpException('puzzle not found', HttpStatus.NOT_FOUND))
       .populate('owner');
+
+    if (puzzle.visibility === Visibility.Public) {
+      throw new HttpException(
+        'public puzzles can not be updated',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
     if (puzzle.title !== data.title) {
       const titleExist = await this.puzzleModel.exists({
@@ -156,16 +192,6 @@ export class PuzzleService implements OnModuleInit {
       throw new HttpException(
         'you do not have permission to edit this puzzle',
         HttpStatus.FORBIDDEN,
-      );
-    }
-
-    if (
-      puzzle.visibility === Visibility.Public &&
-      data.visibility !== Visibility.Public
-    ) {
-      throw new HttpException(
-        'you cannot change visibity from public',
-        HttpStatus.BAD_REQUEST,
       );
     }
 

@@ -23,13 +23,14 @@ Solve jigsaw puzzles alone, with friends, or with the world! This application pr
 The Puzzle App is a web application built for puzzle enthusiasts who want to solve puzzles alone or collaboratively. With an easy-to-use puzzle creation wizard and robust multiplayer features, users can immerse themselves in a fun and engaging experience.
 
 - **Version**: 1.0.0
-- **Technologies Used**: NestJS, MongoDB, NATS Streaming Server, Redis, Minio
+- **Technologies Used**: NestJS, MongoDB, NATS Streaming Server, Redis, Minio, React
 - **Primary Purpose**: Facilitate collaborative jigsaw puzzle-solving
 
 ---
 
 ## Features
 
+- **Single UI**: Simple and intuitive UI to manage your puzzles
 - **Solo Mode**: Solve puzzles on your own.
 - **Invite Friends**: Share a private invite link to collaborate on puzzles.
 - **Public Puzzles**: Join or create public puzzles for anyone to participate.
@@ -232,6 +233,9 @@ Create a shared puzzle by changing visibility to `invite-only`.
 Share the invite link or join an existing public puzzle
 by pressing the `Play` button next to the desired puzzle.
 
+You will be able to see your friends usernames
+as they solve the puzzle with you.
+
 ---
 
 ## Architecture
@@ -248,9 +252,86 @@ The application follows a **microservices architecture**, ensuring scalability a
   - **Sync Service**: Synchronizes multiplayer interactions and tracks progress.
   - **Processing Server**: Turns user-provided images into solvable jigsaw puzzles.
 
----
+> **_NOTE_**: Specific information and technical details about each microservice is available inside a README.md file located in the microservices respective directory.
 
-> **_NOTE_**: Specific information and technical details about each microservice is available inside a README.md file located in the microservices respective directries.
+### Event broker
+
+All the microservices communicate `asynchronously`.
+This means that the microservices do not interact with each other directly, but instead via a central piece of software often called an `event broker`.
+The event broker is in charge of distributing received events to
+subscribers based on expressed interest.
+The event broker implementation that I chose was `nats-streaming-server`.
+
+> **_NOTE_**: `nats-streaming-server` was DEPRECATED in favor of `JetStream`. JetStream sadly doesn't have the same elegance and simplicity as `nats-streaming-server` had and as such I chose to use it regardless.
+
+It was chosen due to its simplicity in setting up the essential features
+needed to facilitate efficient and correct multi-service, multi-instance deployments:
+
+- `queue groups`: essentially a way to group multiple instances of the same service together in order to enable efficient load-balancing of events.
+- `durable subscription`: essentially a way for services to not miss out
+  on events in case they go offline for brief amounts of time. On reconnect the missed events immediately redelivered instead.
+- `manual acknowledgement`: a way for the services to manually acknowledge an event in order to signal its successful processing and handling.
+
+This approach makes the microservices truly independent
+meaning that since there are no explicit dependencies,
+it can function even when all others are experiencing downtime.
+
+## Cross-service data replication
+
+Each type of microservice has its own database instance.
+Although multiple instances of the same microservice share the database instance.
+
+Since we set out to design microservices which were truly independent,
+microservices which are able to serve requests without reliance on other ones, we had to opt-in to data replication.
+
+Each resource within our application has an owner.
+The owner of a resource is what we call the single source of truth.
+All updates to a resource need to happen though the SSOT.
+This is a powerful idea because it greatly simplifies issues that we
+encounter in event-based data replication.
+
+An owner in this context is a microservice. For example, the `puzzle service` owns the `puzzle resource`. The `auth service` owns the `user resource`.
+
+Anytime we need to update a resource, we go though the SSOT and the SSOT
+generates a replication event which other interested services consume
+in order to build their own replica of the resource.
+
+To mitigate all the possible concurrency issues and other issues
+in event-based replication, we introduce a concept of `versioning` to our
+records.
+This means each instance of a resource has a version number (which starts with 0 at creation) and anytime this resource is updated though the SSOT the version is increased and send along with the replication event. When the interested service receives the event, it checks that the
+version of the record is only one less than the version in the event
+body. If it is the event is valid and it applies the update.
+
+This allow the recipient to reject events if they arrived out-of-order.
+When they reject an event, there is a grace period that the `nats-streaming-server` waits until it tries to redeliver it.
+In this period the correct event arrives and the service happily applies it. Then the event is redelivered, the versions now match and it applies it as well. This is called eventual-consistency.
+
+We also introduce a concept of `optimistic concurrency control`. This is
+a method used in distributed systems which does not require locks.
+In a traditional system when a shared resource needs to be modified,
+the writer needs to lock it on order to prevent races.
+The OCC gets rid of locks and instead of prevetitavely locking
+the resource it instead relies on the version numbers
+to check whether the resource has changed after the fact.
+
+This is useful in the context of multiple instances of the same service
+which share the database instance.
+
+Assume that the same event got delivered to two identical instances
+(something went wrong).
+
+Both services will check the version of the resource instance and see that it matches.
+
+They will load the resource into memory, change it based on the event,
+then try to write it back into the database.
+
+The OOC method used in context of `MongoDB` will check
+that the resource has not changed since it has been loaded.
+This will prevent both events from being applied and version numbers
+from being incorrect, as one event will surely be rejected.
+
+---
 
 ## Contributing
 

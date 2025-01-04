@@ -1,99 +1,75 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Puzzle Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+The puzzle service is responsible for managing
+the puzzle resource.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Puzzle resource
 
-## Description
+This service is in charge of managing the puzzle resource. This means
+that is represents the single source of truth for this resrouce. All
+modifications must be made through this service.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+On creation or modification of a resource this service publishes a replication event
+to the event broker so other interested services can update/create their
+own replica of the resource.
 
-## Project setup
+## Puzzle visibility
 
-```bash
-$ npm install
-```
+Each puzzle has a property called `visibility`. It can
+be one of these three values: `invite-only`, `private`, `public`.
+The default value is `private`
 
-## Compile and run the project
+### Public puzzles
 
-```bash
-# development
-$ npm run start
+This property can be updated but not freely. If the puzzle was created with the `public` visibility or at any point updated to have `public` visibility, any subsequent update or delete operation on the puzzle becomes invalid.
 
-# watch mode
-$ npm run start:dev
+This means that only puzzles which are not `public` can be updated or deleted.
+This approach was chosen because creating a `public` puzzle creates an implict contract with the collaborators that any work they do on it
+is also public. If the creator had the ability to remove public puzzles
+they would not be truly public.
 
-# production mode
-$ npm run start:prod
-```
+### Invite-only puzzles
 
-## Run tests
+Visibility of the `invite-only` is probably more what the users will
+be looking for. When visibility is changed to `invite-only` an invite link is created which can be sent to other users to invote them to collaborate.
 
-```bash
-# unit tests
-$ npm run test
+The puzzle creator has the ability to remove collaborators normally,
+and update or delete the puzzle normally.
 
-# e2e tests
-$ npm run test:e2e
+The collaborator can also exceptionally delete themselves from being a collaborator.
 
-# test coverage
-$ npm run test:cov
-```
+### Private puzzles
 
-## Deployment
+Private. Only the creator can access and manage them. Their visibility can be changed to `invite-only` or `public` normally. But like I described above after it becomes `public` no more changes are allowed.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## Creation process
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+For the puzzle to be created user has to supply a source image
+which will be used to generate the jigsaw pieces.
 
-```bash
-$ npm install -g mau
-$ mau deploy
-```
+The image is uploaded to object storage and an event is emitted,
+which signifies that a new puzzle was added to the system.
+All further work on the puzzle is done by the `processing` service.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+When the `processing` service is done it emits an event.
+The service then marks the puzzle as ready and the puzzle is able to be solved finally.
 
-## Resources
+## User replication
 
-Check out a few resources that may come in handy when working with NestJS:
+This service listens for the user replication events.
+So all the events that the `auth` service generates (new user and user updated).
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+The service keeps its own replica of the user resource in order to know
+the details about puzzle creators.
 
-## Support
+## Static assets
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+This service is in charge of service puzzle static assets.
+The first asset is the thumbnail which is the source image that the puzzle pieces were generated from.
+The second asset is the spritesheet of all puzzle pieces
+The third asset is a `.json` file containing all information and
+metadata about the puzzle to allow it to be solvable.
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+These assets (with the exception of thumbnail) can only be served
+if the user is authenticated. In addition, no resource can be served
+before the puzzle processing is done.
