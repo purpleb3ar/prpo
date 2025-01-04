@@ -1,0 +1,11 @@
+import { Subjects } from './subjects';
+
+export interface UserCreatedEvent {
+  subject: Subjects.UserCreated;
+  data: {
+    id: string;
+    username: string;
+    version: number;
+    googleId: string;
+  };
+}

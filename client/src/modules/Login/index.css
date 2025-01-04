@@ -1,0 +1,149 @@
+.login {
+    height: 100vh;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.login-title {
+    margin-top: 10px;
+    font-weight: 600;
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 40px;
+    color: rgba(255, 255, 245, .86);
+}
+
+.divider {
+    margin: 20px 40px;
+    display: flex;
+    flex: 60%;
+    justify-content: space-around;
+    flex-direction: row;
+}
+
+.button-container {
+    display: flex;
+    flex-flow: column;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  color: #454ce1;
+  font-family: Poppins;
+  /* letter-spacing: 1px; */
+  outline: none;
+  font-weight: 500;
+  padding: 15px 18px 15px 18px;
+  border-radius: 50px;
+  font-size: 14px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.primary {
+  background-color: #7b5eea;
+  color: rgba(255, 255, 245, .86);
+}
+
+.primary:hover {
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+
+}
+
+.secondary {
+  background-color: #202127;
+  border: 1px solid #7b5eea;
+  color: #7b5eea;
+}
+
+.terciary {
+  font-size: 16px;
+  padding: 5px 0;
+  background-color: #202127;
+  color: rgba(255, 255, 245, .86);
+}
+
+.secondary:hover {
+  /* color: rgba(255, 255, 245, .89); */
+  border: 2px solid #7b5eea;
+  margin: -1px;
+  /* background-color: #7b5eea;
+  color: rgba(255, 255, 245, .89); */
+  
+  /* box-shadow: rgba(102, 37, 176, 0.2) 0px 8px 24px; */
+  /* box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px; */
+}
+
+.continue-text {
+    margin: 0 30px;
+    color: #949497;
+    font-weight: 600;
+}
+
+.line {
+    display: flex;
+    flex: 20%;
+    background-color: #7a7a7a;
+    margin-top: 12px;
+    height: 2px;
+    border-radius: 40px;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-container {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+input {
+  background-color: #1b1b1f;
+  padding: 14px 20px;
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  font-family: Poppins;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+input::placeholder {
+    font-size: 14px;
+}
+
+.login-box {
+    flex-direction: column;
+    display: flex;
+    gap: 10px;
+    padding: 20px 40px;
+    background-color: #202127;
+    border-radius: 20px;
+    width: 420px;
+}
+
+.register-prompt {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    color: #949497;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.register-button {
+    color: #7b5eea;
+    font-weight: 600;
+    cursor: pointer;
+}

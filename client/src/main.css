@@ -1,0 +1,21 @@
+:root {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.5;
+    font-weight: 500;
+
+    color-scheme: dark;
+    background-color: #1b1b1f;
+    box-sizing: border-box;
+    --toastify-color-dark: #1b1b1f;
+    --toastify-text-color-dark: rgba(255, 255, 245, .86);
+    --toastify-color-error: #a13c3c;
+    --toastify-color-success: #7b5eea;
+}
+
+body {
+    margin: 0;
+    display: flex;
+    place-items: center;
+    min-width: 320px;
+    height: 100vh;
+}

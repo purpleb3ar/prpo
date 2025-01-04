@@ -1,0 +1,98 @@
+# Use root/example as user/password credentials
+version: "3.8"
+
+services:
+  mongo_sync:
+    image: mongo
+    container_name: mongo_sync
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - "./data/sync_db:/data/db"
+    ports:
+      - "27019:27017"
+
+  mongo_auth:
+    image: mongo
+    container_name: mongo_auth
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - "./data/auth_db:/data/db"
+    ports:
+      - "27017:27017"
+
+  # auth_service:
+  #   build:
+  #     dockerfile: Dockerfile
+  #     context: auth
+  #     target: development
+  #   env_file:
+  #     - auth/.env
+  #   command: npm run start:dev
+  #   user: node
+  #   ports:
+  #     - 9000:9000
+
+  mongo_puzzle:
+    image: mongo
+    container_name: mongo_puzzle
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - "./data/puzzle_db:/data/db"
+    ports:
+      - "27018:27017"
+
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=purplebear1
+      - MINIO_ROOT_PASSWORD=744247e0c9239e4ccdfe9e3df531ae74
+    ports:
+      - "12000:9000"
+      - "12001:9001"
+    volumes:
+      - "./data/minio:/data"
+    restart: unless-stopped
+
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    restart: always
+    ports:
+      - "7622:6379"
+    volumes:
+      - "./data/redis:/data"
+
+  nats:
+    image: nats-streaming
+    restart: always
+    container_name: nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command:
+      [
+        "-p",
+        "4222",
+        "-m",
+        "8222",
+        "-hbi",
+        "5s",
+        "-hbt",
+        "5s",
+        "-hbf",
+        "2",
+        "-SD",
+        "-cid",
+        "puzzle-app",
+      ]

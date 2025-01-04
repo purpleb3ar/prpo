@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: puzzle-mongo-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: puzzle-mongo
+  template:
+    metadata:
+      labels:
+        app: puzzle-mongo
+    spec:
+      containers:
+        - name: puzzle-mongo
+          image: mongo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: puzzle-mongo-srv
+spec:
+  selector:
+    app: puzzle-mongo
+  ports:
+    - name: db
+      protocol: TCP
+      port: 27017
+      targetPort: 27017
