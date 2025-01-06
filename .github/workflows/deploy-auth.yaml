@@ -19,6 +19,6 @@ jobs:
         env:
           REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
           REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-      - run: |
+        run: |
           echo "$REGISTRY_PASSWORD" | docker login registry.purplebear.io -u $REGISTRY_USERNAME --password-stdin
           docker push registry.purplebear.io/prpo-puzzle-app-auth
