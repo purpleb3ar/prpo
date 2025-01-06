@@ -2,12 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
+import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { LoggerErrorInterceptor, Logger } from 'nestjs-pino';
 import { CustomStrategy } from '@nestjs/microservices';
 import { Listener } from '@nestjs-plugins/nestjs-nats-streaming-transport';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -37,6 +38,7 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       stopAtFirstError: true,
+      errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
     }),
   );
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
@@ -70,6 +72,25 @@ async function bootstrap() {
   app.connectMicroservice(options);
 
   await app.startAllMicroservices();
+
+  const config = new DocumentBuilder()
+    .addCookieAuth('prpo_app_access_token', {
+      type: 'apiKey',
+      in: 'cookie',
+      name: 'prpo_app_access_token',
+      description: 'The cookie includes the JWT',
+    })
+    .setTitle('Auth Service API')
+    .setDescription(
+      'Service in charge of user authetication and managing the user resource',
+    )
+    .setVersion('1.0')
+    .build();
+
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+
+  SwaggerModule.setup('api', app, documentFactory);
+
   await app.listen(port);
 }
 bootstrap();

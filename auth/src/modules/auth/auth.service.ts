@@ -65,7 +65,7 @@ export class AuthService {
   }
 
   async registerUser(registerDto: RegisterDto) {
-    const existingUser = await this.userService.findLocalByUsername(
+    const existingUser = await this.userService.findByUsername(
       registerDto.username,
     );
 

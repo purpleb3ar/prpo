@@ -1,0 +1,20 @@
+name: deploy-auth
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "auth/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cd auth && docker build -t registry.purplebear.io/prpo-puzzle-app-auth -f Dockerfile .
+      - run: echo "$REGISTRY_PASSWORD" | docker login registry.purplebear.io -u $REGISTRY_USERNAME --password-stdin
+        env:
+          DOCKER_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+      - run: docker push registry.purplebear.io/prpo-puzzle-app-auth
