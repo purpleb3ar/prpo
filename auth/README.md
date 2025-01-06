@@ -1,4 +1,4 @@
-# Auth Service
+# Auth Service - Test
 
 The authencation service is responsible for handling user authencation.
 We provide two options for authentication, either `local` (with username and password) or `google` (sign in with google sso).
