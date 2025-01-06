@@ -18,7 +18,6 @@ interface IImageData {
 
 const CanvasGrid: React.FC<CanvasGridProps> = ({
   image,
-  scale,
   columns,
   rows,
   baseSize,

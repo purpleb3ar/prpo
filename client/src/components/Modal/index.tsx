@@ -22,7 +22,7 @@ const ModalBase: React.FC<ModalBaseProps> = memo(
       }
     };
 
-    const handleClickOutside: MouseEventHandler<HTMLDivElement> = (event) => {
+    const handleClickOutside: MouseEventHandler<HTMLDivElement> = () => {
       onClose();
     };
 

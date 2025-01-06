@@ -1,27 +1,25 @@
 import { useState } from "react";
-import "./index.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../app/auth";
 import { toast } from "react-toastify";
 import { ensureErrorMessage } from "../../shared/helpers/ensureErrorMessage";
 
-const LOGIN_ROUTE = "http://localhost:9000/auth/login";
 const GOOGLE_LOGIN_URL = "http://localhost:9000/auth/google";
+const REGISTER_ROUTE = "http://localhost:9000/auth/register";
 
-const Login: React.FC = () => {
+const Register = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const navigate = useNavigate();
   const location = useLocation();
-
   const { checkAuth } = useAuth();
 
-  const login = async () => {
+  const register = async () => {
     if (!username || !password) {
       return;
     }
 
-    const response = await fetch(LOGIN_ROUTE, {
+    const response = await fetch(REGISTER_ROUTE, {
       method: "POST",
       credentials: "include",
       body: JSON.stringify({
@@ -38,25 +36,26 @@ const Login: React.FC = () => {
       return toast.error(ensureErrorMessage(errorResponse));
     }
 
+    toast.success("Registration successful");
+
     await checkAuth();
     const from =
       (location.state as { from?: Location })?.from?.pathname || "/app";
-
-    return navigate(from, { replace: true });
+    navigate(from, { replace: true });
   };
 
-  const handleGoogleLogin = () => {
+  const handleSignInClick = () => {
+    navigate("/login");
+  };
+
+  const handleGoogleRegister = () => {
     window.location.href = GOOGLE_LOGIN_URL;
-  };
-
-  const handleSignupClick = () => {
-    navigate("/register");
   };
 
   return (
     <div className="login">
       <div className="login-box">
-        <span className="login-title">Hi, welcome back! 🤡</span>
+        <span className="login-title">Hi, welcome! 🤡</span>
         <div className="input-container">
           <input
             type="text"
@@ -74,8 +73,8 @@ const Login: React.FC = () => {
           />
         </div>
         <div className="button-container">
-          <button className="primary" onClick={() => login()}>
-            Login
+          <button className="primary" onClick={() => register()}>
+            Register
           </button>
         </div>
         <div className="divider">
@@ -84,15 +83,15 @@ const Login: React.FC = () => {
           <div className="line"></div>
         </div>
         <div className="button-container">
-          <button className="secondary" onClick={() => handleGoogleLogin()}>
-            Login with Google
+          <button className="secondary" onClick={() => handleGoogleRegister()}>
+            Sign up with Google
           </button>
         </div>
 
         <div className="register-prompt">
-          Don't have an account?{" "}
-          <span className="register-button" onClick={() => handleSignupClick()}>
-            Sign up!
+          Already have an account?{" "}
+          <span className="register-button" onClick={() => handleSignInClick()}>
+            Sign in!
           </span>
         </div>
       </div>
@@ -100,4 +99,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Register;

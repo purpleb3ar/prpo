@@ -1,6 +1,6 @@
 import { ReactNode, FC } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../app/auth";
+import { useAuth } from "../../app/auth";
 
 interface RequireAuthProps {
   children: ReactNode;

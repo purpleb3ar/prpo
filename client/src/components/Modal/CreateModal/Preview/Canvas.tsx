@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-const ForwardRefCanvas = React.forwardRef((props, ref) => {
+const ForwardRefCanvas = React.forwardRef((_, ref) => {
   // @ts-ignore
   return <canvas ref={ref}></canvas>;
 });

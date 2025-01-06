@@ -1,17 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import {
   CirclePlay,
-  Delete,
   Edit2,
   PuzzleIcon,
   Ruler,
   Trash2,
   User,
 } from "lucide-react";
-import { useAuth } from "../../../app/auth";
-import { DNA, Grid } from "react-loader-spinner";
-import { memo, useEffect } from "react";
-import { ModalType, useModal } from "../../../app/modal";
+import { useAuth } from "../../../../app/auth";
+import { Grid } from "react-loader-spinner";
+import { useEffect } from "react";
+import { ModalType, useModal } from "../../../../app/modal";
 
 export enum Visibility {
   Public = "public",
@@ -59,6 +58,7 @@ const PuzzleItem: React.FC<PuzzleProps> = ({
   puzzle,
   onClickUpdate,
   onClickPlay,
+  onClickDelete,
 }) => {
   const { user } = useAuth();
   const { openModal } = useModal();
@@ -100,6 +100,15 @@ const PuzzleItem: React.FC<PuzzleProps> = ({
     });
   };
 
+  const handleDeleteClick = () => {
+    openModal(ModalType.DELETE, {
+      title: puzzle.title,
+      puzzleId: puzzle.id,
+      ownerId: puzzle.owner.id,
+      onSuccess: onClickDelete,
+    });
+  };
+
   return (
     <div className="puzzle-item">
       <div className="puzzle-item-overview">
@@ -107,7 +116,12 @@ const PuzzleItem: React.FC<PuzzleProps> = ({
           <Grid color={"#7b5eea"} visible={true} height={40} width={40}></Grid>
         )}
         {isReady && (
-          <img className="puzzle-item-thumbnail" src={thumbnailURL} alt="" />
+          <img
+            className="puzzle-item-thumbnail"
+            src={thumbnailURL}
+            crossOrigin="anonymous"
+            alt=""
+          />
         )}
         <div className="puzzle-item-title">{puzzle.title}</div>
       </div>
@@ -133,12 +147,15 @@ const PuzzleItem: React.FC<PuzzleProps> = ({
         </div>
       </div>
       <div className="puzzle-item-play">
-        {isOwner && (
-          <button className="action-button-secondary action-button">
+        {puzzle.visibility !== Visibility.Public && (
+          <button
+            onClick={() => handleDeleteClick()}
+            className="action-button-secondary action-button"
+          >
             <Trash2 size={20}></Trash2>
           </button>
         )}
-        {isOwner && (
+        {isOwner && puzzle.visibility !== Visibility.Public && (
           <button
             onClick={() => handleUpdateClick()}
             className="action-button-secondary action-button"

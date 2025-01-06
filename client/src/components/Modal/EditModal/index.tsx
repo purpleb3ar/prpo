@@ -2,16 +2,17 @@ import "./index.css";
 import {
   Check,
   Clipboard,
-  CopyIcon,
-  Divide,
   Edit2Icon,
   PlusIcon,
   UserIcon,
   XIcon,
 } from "lucide-react";
-import { Puzzle, Visibility } from "../../../modules/Home/PuzzleList";
+import {
+  Puzzle,
+  Visibility,
+} from "../../../modules/Home/components/PuzzleList";
 import { useEffect, useMemo, useState } from "react";
-import { DNA, ThreeDots } from "react-loader-spinner";
+import { ThreeDots } from "react-loader-spinner";
 import { toast } from "react-toastify";
 
 const ensureErrorMessage = (errorResponse: any) => {

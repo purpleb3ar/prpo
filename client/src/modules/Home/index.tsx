@@ -8,7 +8,7 @@ import {
   User2,
 } from "lucide-react";
 import { useAuth } from "../../app/auth";
-import PuzzleList, { Puzzle } from "./PuzzleList";
+import PuzzleList, { Puzzle } from "./components/PuzzleList";
 import { useEffect, useState } from "react";
 
 const GET_PUZZLES_ROUTE = "http://localhost:9001/puzzles";
@@ -18,12 +18,6 @@ const Home: React.FC = () => {
   const { user, logout } = useAuth();
   const [puzzles, setPuzzles] = useState<Puzzle[]>([]);
   const [filter, setFilter] = useState("owned");
-
-  const onClick = () => {
-    openModal(ModalType.CREATE, {
-      title: "Create new",
-    });
-  };
 
   const getPuzzles = async () => {
     const routeSuffix = filter === "public" ? "/public" : "";

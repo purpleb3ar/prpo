@@ -8,6 +8,8 @@ import Playground from "../modules/Playground";
 import { RequireNonAuth } from "../components/RequireNonAuth";
 import { ModalProvider } from "./modal";
 import { Bounce, ToastContainer } from "react-toastify";
+import Invite from "../modules/Invite";
+import Register from "../modules/Register";
 
 const App: React.FC = () => {
   return (
@@ -24,6 +26,14 @@ const App: React.FC = () => {
               }
             ></Route>
             <Route
+              path="/register"
+              element={
+                <RequireNonAuth>
+                  <Register></Register>
+                </RequireNonAuth>
+              }
+            ></Route>
+            <Route
               path="/app"
               element={
                 <RequireAuth>
@@ -36,6 +46,14 @@ const App: React.FC = () => {
               element={
                 <RequireAuth>
                   <Playground></Playground>
+                </RequireAuth>
+              }
+            ></Route>
+            <Route
+              path="/collab/:key"
+              element={
+                <RequireAuth>
+                  <Invite></Invite>
                 </RequireAuth>
               }
             ></Route>

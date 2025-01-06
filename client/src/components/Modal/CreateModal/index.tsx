@@ -2,7 +2,7 @@ import "./index.css";
 import { X, Check, PuzzleIcon, ImageIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import CanvasGrid from "./Preview";
-import { Puzzle } from "../../../modules/Home/PuzzleList";
+import { Puzzle } from "../../../modules/Home/components/PuzzleList";
 import { toast } from "react-toastify";
 
 interface SettingsModalProps {

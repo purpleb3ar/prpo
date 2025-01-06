@@ -3,6 +3,7 @@ import ModalBase from "../components/Modal";
 import CreateModal from "../components/Modal/CreateModal";
 import SettingsModal from "../components/Modal/SettingsModal";
 import { EditModal } from "../components/Modal/EditModal";
+import DeleteModal from "../components/Modal/DeleteModal";
 
 export enum ModalType {
   CREATE,
@@ -14,7 +15,7 @@ export enum ModalType {
 const modalComponents: Record<ModalType, any> = {
   [ModalType.CREATE]: CreateModal,
   [ModalType.UPDATE]: EditModal,
-  [ModalType.DELETE]: <div>Delete modal</div>,
+  [ModalType.DELETE]: DeleteModal,
   [ModalType.SETTINGS]: SettingsModal,
 };
 
