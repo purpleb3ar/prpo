@@ -1,5 +1,10 @@
 name: deploy-client
 
+env:
+  IMAGE_NAME: prpo-puzzle-app-client
+  DIRECTORY: client
+  DEPLOYMENT_NAME: client-depl
+
 on:
   push:
     branches:
@@ -8,17 +13,28 @@ on:
       - "client/**"
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Build
-        run: |
-          cd client && docker build -t registry.purplebear.io/prpo-puzzle-app-client -f Dockerfile .
-      - name: Push
         env:
           REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
           REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          REGISTRY_URL: ${{ vars.REGISTRY_URL }}
         run: |
-          echo "$REGISTRY_PASSWORD" | docker login registry.purplebear.io -u $REGISTRY_USERNAME --password-stdin
-          docker push registry.purplebear.io/prpo-puzzle-app-client
+          cd $DIRECTORY && docker build -t $REGISTRY_URL/$IMAGE_NAME -f Dockerfile .
+      - name: Push
+        run: |
+          echo "$REGISTRY_PASSWORD" | docker login $REGISTRY_URL -u $REGISTRY_USERNAME --password-stdin
+          docker push $REGISTRY_URL/$IMAGE_NAME
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions-hub/kubectl@master
+        name: Deploy
+        env:
+          KUBE_CONFIG: ${{ secrets.K8S_KUBECONFIG }}
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
+        run: |
+          kubectl rollout restart deployment $DEPLOYMENT_NAME -n $K8S_NAMESPACE
