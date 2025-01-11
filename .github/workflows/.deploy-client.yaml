@@ -32,10 +32,10 @@ jobs:
           docker push $REGISTRY_URL/$IMAGE_NAME
   deploy:
     needs: build-and-push
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions-hub/kubectl@master
-      - name: Deploy
         env:
           KUBE_CONFIG: ${{ secrets.K8S_KUBECONFIG }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
