@@ -25,8 +25,11 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-const CHECK_AUTH_ROUTE = "http://localhost:9000/users/me";
-const LOGOUT_ROUTE = "http://localhost:9000/auth/logout";
+// const CHECK_AUTH_ROUTE = "http://localhost:9000/users/me";
+// const LOGOUT_ROUTE = "http://localhost:9000/auth/logout";
+
+const CHECK_AUTH_ROUTE = "https://prpo.purplebear.io/users/me";
+const LOGOUT_ROUTE = "https://prpo.purplebear.io/auth/logout";
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState(null);
