@@ -3,7 +3,7 @@ import { registerAs } from '@nestjs/config';
 export default registerAs('app', (): Record<string, unknown> => {
   const frontendURL =
     process.env.NODE_ENV === 'production'
-      ? 'https://puzzle.purplebear.io'
+      ? 'https://prpo.purplebear.io'
       : 'http://localhost:5173';
 
   return {

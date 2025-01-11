@@ -4,10 +4,10 @@ export default registerAs('app', (): Record<string, unknown> => {
   const frontendURL =
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:5173'
-      : 'https://puzzle.purplebear.io';
+      : 'https://prpo.purplebear.io';
 
   const cookieDomain =
-    process.env.NODE_ENV === 'development' ? undefined : 'puzzle.purplebear.io';
+    process.env.NODE_ENV === 'development' ? undefined : 'prpo.purplebear.io';
 
   return {
     appName: process.env.APP_NAME,

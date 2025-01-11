@@ -30,7 +30,7 @@ interface RoomMetadata {
 // Configuring cors though DI is not supported sadly
 const frontendURL =
   process.env.NODE_ENV === 'production'
-    ? 'https://puzzle.purplebear.io'
+    ? 'https://prpo.purplebear.io'
     : 'http://localhost:5173';
 
 @WebSocketGateway({
