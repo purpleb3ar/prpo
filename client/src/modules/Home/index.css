@@ -179,7 +179,7 @@ option {
     display: flex;
     justify-content: center;
     gap: 20px;
-    flex: 30%;
+    flex: 50%;
     font-size: 18px;
 }
 

@@ -21,7 +21,7 @@ import { Repeat1Icon } from "lucide-react";
 // const SOCKET_URL = "http://localhost:9003";
 
 const FETCH_DETAILS_URL = "https://prpo.purplebear.io/puzzles";
-const SOCKET_URL = "https://prpo.purplebear.io/sync";
+const SOCKET_URL = "https://prpo.purplebear.io";
 
 interface PieceAttrs {
   actualSize: number;
@@ -242,6 +242,7 @@ const Playground: React.FC = () => {
     const newSocket = io(SOCKET_URL, {
       autoConnect: true,
       withCredentials: true,
+
       path: "/socket.io",
       transports: ["websocket"],
       query: {
