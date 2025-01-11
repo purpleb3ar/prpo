@@ -2,4 +2,4 @@
 
 Showcases functionality of the app.
 
-App
+App uses
