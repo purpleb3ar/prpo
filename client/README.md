@@ -1,3 +1,3 @@
 # Client
 
-Showcases functionality of
+Showcases functionality of the
