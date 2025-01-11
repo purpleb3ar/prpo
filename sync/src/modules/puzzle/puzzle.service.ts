@@ -99,11 +99,11 @@ export class PuzzleService {
       puzzle.collaborators.includes(user.id) &&
       puzzle.visibility === Visibility.InviteOnly;
 
-    const isOwner = puzzle.owner === user.id;
+    const isOwner = puzzle.owner.toString() === user.id;
     const isPublic = puzzle.visibility === Visibility.Public;
 
     if (isCollaborator || isOwner || isPublic) {
-      return true;
+      return { hasAccess: true, puzzle };
     }
 
     throw new WsException('You do not have permission to access this puzzle');

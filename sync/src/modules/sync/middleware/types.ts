@@ -4,6 +4,7 @@ import { TokenPayload } from '../../auth/types';
 export interface AuthSocket extends Socket {
   user: TokenPayload;
   puzzleId: string;
+  totalPieces: number;
 }
 
 export type SocketMiddleware = (

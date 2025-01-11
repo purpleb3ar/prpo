@@ -6,7 +6,6 @@ import { LoggerModule } from 'nestjs-pino';
 import { HealthModule } from 'src/modules/health/health.module';
 import { Publisher } from '@nestjs-plugins/nestjs-nats-streaming-transport';
 import { NatsModule } from 'src/modules/nats/nats.module';
-import { AuthModule } from 'src/modules/auth/auth.module';
 import { NestMinioModule } from 'nestjs-minio';
 import minioConfig from 'src/config/minio.config';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
@@ -83,7 +82,6 @@ import { RedisClient } from './common/types';
     NatsModule,
     HealthModule,
 
-    AuthModule,
     PuzzleGenModule,
     PuzzleModule,
   ],

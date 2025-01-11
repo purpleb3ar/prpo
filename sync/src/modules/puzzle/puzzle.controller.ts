@@ -28,7 +28,6 @@ export class PuzzleController {
     @Ctx() { message }: NatsStreamingContext,
   ) {
     const ack = await this.puzzleService.updatePuzzle(data);
-
     if (ack) {
       message.ack();
     }

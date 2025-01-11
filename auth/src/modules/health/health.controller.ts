@@ -18,7 +18,7 @@ export class HealthController {
   @ApiOperation({
     summary: 'Checks the readiness of the service',
     description:
-      'This route performs various health checks to determine whether the service is ready and ready to handle requests.\n\nThe following checks are performed: \n\nWhether the `mongodb` instance is accessible.\n\nWhether the `nats` instance can receive events.',
+      'This route performs various health checks to determine whether the service is ready to handle requests.\n\nThe following checks are performed: \n\nWhether the `mongodb` instance is accessible.\n\nWhether the `nats` instance can receive events.',
   })
   @ApiResponse({
     status: 200,
@@ -26,7 +26,7 @@ export class HealthController {
   })
   @ApiResponse({
     status: 503,
-    description: 'The service is not healthly and unable to handle requests',
+    description: 'The service is not healthy and unable to handle requests',
   })
   @Get('/readyz')
   @HealthCheck()

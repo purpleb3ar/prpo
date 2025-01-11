@@ -1,4 +1,5 @@
 export enum PuzzleEvent {
+  ClientCreatePiece = 'client:createPiece',
   // emitted by the person who moved (picked up and dropped) a puzzle piece
   // and broadcasted to everyone in the room
   ClientMovePiece = 'client:movePiece',
@@ -21,7 +22,8 @@ export enum PuzzleEvent {
   // into a single group and all puzzles
   // from the one group are moved
   // into one
-  PieceJoined = 'piece-joined',
+  ClientJoinPiece = 'client:joinPiece',
+  ServerPieceJoined = 'server:pieceJoined',
 
   // emitted when a user clicks on a puzzle
   // emitted when a user clicks on a puzzle within a group
@@ -38,6 +40,8 @@ export enum PuzzleEvent {
   // this event contains the current puzzle state
   // (locations of puzzles, groups, connections, etc, etc)
   ServerPuzzleState = 'server:puzzleState',
+  ClientRequestActions = 'client:request:actions',
+  ServerResponseActions = 'server:response:actions',
 
   // emitted when new connections are made
   // connections are defined in a special way

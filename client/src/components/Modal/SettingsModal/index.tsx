@@ -3,7 +3,8 @@ import { useAuth } from "../../../app/auth";
 import { Settings2, X, Check } from "lucide-react";
 import { toast } from "react-toastify";
 
-const UPDATE_PROFILE_ROUTE = "http://localhost:9000/users";
+// const UPDATE_PROFILE_ROUTE = "http://localhost:9000/users";
+const UPDATE_PROFILE_ROUTE = "https://prpo.purplebear.io/users";
 
 interface SettingsModalProps {
   closeModal: () => void;

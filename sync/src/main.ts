@@ -6,41 +6,49 @@ import { ValidationPipe } from '@nestjs/common';
 import { LoggerErrorInterceptor, Logger } from 'nestjs-pino';
 import { CustomStrategy } from '@nestjs/microservices';
 import { Listener } from '@nestjs-plugins/nestjs-nats-streaming-transport';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
   });
 
-  app.enableShutdownHooks();
+  app.disable('x-powered-by');
+  app.enable('trust proxy');
 
   const configService = app.get(ConfigService);
+
+  app.use(helmet());
+
+  const frontendURL = configService.get('app.frontendURL');
+  app.enableCors({
+    credentials: true,
+    origin: frontendURL,
+    allowedHeaders: ['content-type', 'cookie'],
+    methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE'],
+  });
+
+  app.enableShutdownHooks();
 
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
       whitelist: true,
       stopAtFirstError: true,
+      errorHttpStatusCode: 422,
     }),
   );
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
 
   app.useLogger(app.get(Logger));
 
-  app.disable('x-powered-by');
-  app.enable('trust proxy');
-
-  app.enableCors({
-    origin: 'http://localhost:3000',
-    allowedHeaders: ['Authorization'],
-  });
-
   const port = configService.get<string>('app.http.port');
   const clusterId = configService.get<string>('nats.clusterId');
   const clientId = configService.get<string>('nats.clientId');
   const url = configService.get<string>('nats.url');
   const queueGroupName = configService.get<string>('nats.queueGroupName');
-  console.log(port, clusterId, clientId, url, queueGroupName);
+
   const options: CustomStrategy = {
     strategy: new Listener(
       clusterId,
@@ -52,9 +60,7 @@ async function bootstrap() {
         reconnectTimeWait: 2000,
       },
       {
-        // NOTE: we use the durable name of the puzzle service
-        // in order to get the entire event history
-        durableName: 'puzzle-service',
+        durableName: 'puzzle-depl',
         manualAckMode: true,
         deliverAllAvailable: true,
         ackWait: 2000,
@@ -64,6 +70,18 @@ async function bootstrap() {
   app.connectMicroservice(options);
 
   await app.startAllMicroservices();
+
+  const config = new DocumentBuilder()
+    .setTitle('Sync Service API')
+    .setDescription(
+      'Service in charge puzzle event synchronization, progress tracking and room management',
+    )
+    .setVersion('1.0')
+    .build();
+
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
+
   await app.listen(port);
 }
 bootstrap();

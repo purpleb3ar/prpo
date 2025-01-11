@@ -20,7 +20,8 @@ const ensureErrorMessage = (errorResponse: any) => {
   return "Something went wrong";
 };
 
-const CREATE_PUZZLE_URL = "http://localhost:9001/puzzles";
+// const CREATE_PUZZLE_URL = "http://localhost:9001/puzzles";
+const CREATE_PUZZLE_URL = "https://prpo.purplebear.io/puzzles";
 
 const CreateModal: React.FC<SettingsModalProps> = ({
   onSuccess,

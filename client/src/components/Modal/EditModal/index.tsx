@@ -78,9 +78,13 @@ const Collaborator: React.FC<CollaboratorProps> = ({
   );
 };
 
-const GET_SINGLE_URL = "http://localhost:9001/puzzles";
-const UPDATE_SINGLE_URL = "http://localhost:9001/puzzles";
-const REMOVE_COLLABORATOR = "http://localhost:9001/puzzles";
+// const GET_SINGLE_URL = "http://localhost:9001/puzzles";
+// const UPDATE_SINGLE_URL = "http://localhost:9001/puzzles";
+// const REMOVE_COLLABORATOR = "http://localhost:9001/puzzles";
+
+const GET_SINGLE_URL = "https://prpo.purplebear.io/puzzles";
+const UPDATE_SINGLE_URL = "https://prpo.purplebear.io/puzzles";
+const REMOVE_COLLABORATOR = "https://prpo.purplebear.io/puzzles";
 
 export const EditModal: React.FC<EditModalProps> = ({
   closeModal,

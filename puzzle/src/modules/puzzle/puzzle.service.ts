@@ -291,12 +291,7 @@ export class PuzzleService implements OnModuleInit {
           },
         ],
       })
-      .orFail(
-        new HttpException(
-          'only owner can remove collaborators',
-          HttpStatus.BAD_REQUEST,
-        ),
-      )
+      .orFail(new HttpException('puzzle not found', HttpStatus.NOT_FOUND))
       .populate('owner');
 
     console.log(puzzle.owner);
@@ -349,14 +344,18 @@ export class PuzzleService implements OnModuleInit {
       `Fetching '${objectName}' from '${this.bucketName}' bucket`,
     );
 
-    const client = this.minioService.getMinio();
-    const stat = await client.statObject(this.bucketName, objectName);
+    try {
+      const client = this.minioService.getMinio();
+      const stat = await client.statObject(this.bucketName, objectName);
 
-    return {
-      contentType: stat.metaData['content-type'],
-      size: stat.size,
-      stream: await client.getObject(this.bucketName, objectName),
-    };
+      return {
+        contentType: stat.metaData['content-type'],
+        size: stat.size,
+        stream: await client.getObject(this.bucketName, objectName),
+      };
+    } catch (err) {
+      throw new HttpException('not found', HttpStatus.NOT_FOUND);
+    }
   }
 
   async getThumbnailAsStream(id: string) {
@@ -404,15 +403,20 @@ export class PuzzleService implements OnModuleInit {
   async getSingle(user: TokenPayload, id: string) {
     const puzzle = await this.puzzleModel
       .findOne({
-        $and: [
-          { _id: id },
+        $or: [
+          { $and: [{ _id: id }, { visibility: Visibility.Public }] },
           {
-            $or: [
-              { owner: user.id },
+            $and: [
+              { _id: id },
               {
-                collaborators: {
-                  $in: [user.id],
-                },
+                $or: [
+                  { owner: user.id },
+                  {
+                    collaborators: {
+                      $in: [user.id],
+                    },
+                  },
+                ],
               },
             ],
           },

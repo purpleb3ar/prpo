@@ -5,8 +5,11 @@ import { useAuth } from "../../app/auth";
 import { toast } from "react-toastify";
 import { ensureErrorMessage } from "../../shared/helpers/ensureErrorMessage";
 
-const LOGIN_ROUTE = "http://localhost:9000/auth/login";
-const GOOGLE_LOGIN_URL = "http://localhost:9000/auth/google";
+// const LOGIN_ROUTE = "http://localhost:9000/auth/login";
+// const GOOGLE_LOGIN_URL = "http://localhost:9000/auth/google";
+
+const LOGIN_ROUTE = "https://prpo.purplebear.io/auth/login";
+const GOOGLE_LOGIN_URL = "https://prpo.purplebear.io/auth/google";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>("");

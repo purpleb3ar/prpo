@@ -17,5 +17,5 @@ export default registerAs('nats', () => ({
   clientId: getClientId(),
   url: process.env.NATS_CLIENT_URL,
 
-  queueGroupName: 'auth-service', // user for load balancing purposes
+  queueGroupName: 'auth-depl', // user for load balancing purposes
 }));

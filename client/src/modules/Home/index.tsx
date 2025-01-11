@@ -11,7 +11,8 @@ import { useAuth } from "../../app/auth";
 import PuzzleList, { Puzzle } from "./components/PuzzleList";
 import { useEffect, useState } from "react";
 
-const GET_PUZZLES_ROUTE = "http://localhost:9001/puzzles";
+// const GET_PUZZLES_ROUTE = "http://localhost:9001/puzzles";
+const GET_PUZZLES_ROUTE = "https://prpo.purplebear.io/puzzles";
 
 const Home: React.FC = () => {
   const { openModal } = useModal();

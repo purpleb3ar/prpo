@@ -8,31 +8,30 @@ export const wsHasAccessMiddlware = (
   puzzleService: PuzzleService,
 ): SocketMiddleware => {
   return async (socket: AuthSocket, next) => {
-    console.log(socket.handshake.headers);
-    try {
-      logger.info('Checking whether user can access this room');
+    logger.info('Checking whether user can access this room');
 
-      const puzzleId = Array.isArray(socket.handshake.headers.puzzleid)
-        ? socket.handshake.headers.puzzleid[0]
-        : socket.handshake.headers.puzzleid;
+    try {
+      const query = socket.handshake.query;
+      const puzzleId = Array.isArray(query.room) ? query.room[0] : query.room;
 
       if (!puzzleId) {
         logger.error('Missing puzzleId');
         return next(new WsException('Missing puzzleId'));
       }
 
-      const hasAccess = await puzzleService.wsCheckAccess(
+      const { hasAccess, puzzle } = await puzzleService.wsCheckAccess(
         socket.user,
         puzzleId,
       );
 
       if (hasAccess) {
         logger.info('Puzzle id is valid and user has permission to access it');
-        socket.puzzleId = puzzleId;
+        socket.puzzleId = puzzle.id;
+        socket.totalPieces = puzzle.rows * puzzle.columns;
         return next();
       }
     } catch (error) {
-      logger.error('Missing puzzleId', error);
+      logger.error('authentication error', error);
       return next(error);
     }
   };

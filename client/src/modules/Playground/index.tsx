@@ -17,8 +17,11 @@ import { Map } from "./components/Map";
 import { toast } from "react-toastify";
 import { Repeat1Icon } from "lucide-react";
 
-const FETCH_DETAILS_URL = "http://localhost:9001/puzzles";
-const SOCKET_URL = "http://localhost:9003";
+// const FETCH_DETAILS_URL = "http://localhost:9001/puzzles";
+// const SOCKET_URL = "http://localhost:9003";
+
+const FETCH_DETAILS_URL = "https://prpo.purplebear.io/puzzles";
+const SOCKET_URL = "https://prpo.purplebear.io/sync";
 
 interface PieceAttrs {
   actualSize: number;

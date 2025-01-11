@@ -21,8 +21,11 @@ interface DeleteModalProps {
   ownerId: string;
 }
 
-const DELETE_ROUTE = "http://localhost:9001/puzzles";
-const REMOVE_COLLABORATOR = "http://localhost:9001/puzzles";
+// const DELETE_ROUTE = "http://localhost:9001/puzzles";
+// const REMOVE_COLLABORATOR = "http://localhost:9001/puzzles";
+
+const DELETE_ROUTE = "https://prpo.purplebear.io/puzzles";
+const REMOVE_COLLABORATOR = "https://prpo.purplebear.io/puzzles";
 
 const DeleteModal: React.FC<DeleteModalProps> = ({
   closeModal,

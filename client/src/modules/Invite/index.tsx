@@ -12,7 +12,8 @@ const ensureErrorMessage = (errorResponse: any) => {
   return "Something went wrong";
 };
 
-const ADD_COLLABORATOR_ROUTE = "http://localhost:9001/puzzles/invite";
+const ADD_COLLABORATOR_ROUTE = "https://prpo.purplebear.io/puzzles/invite";
+// const ADD_COLLABORATOR_ROUTE = "http://localhost:9001/puzzles/invite";
 
 const Invite: React.FC = () => {
   const navigate = useNavigate();

@@ -1,10 +1,14 @@
 import { registerAs } from '@nestjs/config';
 
-export default registerAs(
-  'app',
-  (): Record<string, unknown> => ({
+export default registerAs('app', (): Record<string, unknown> => {
+  const frontendURL =
+    process.env.NODE_ENV === 'production'
+      ? 'https://puzzle.purplebear.io'
+      : 'http://localhost:5173';
+  return {
     appName: process.env.APP_NAME,
     env: process.env.NODE_ENV || 'development',
+    frontendURL,
 
     jwt: {
       secret: process.env.JWT_SECRET,
@@ -19,5 +23,5 @@ export default registerAs(
       host: '0.0.0.0',
       port: process.env.PORT,
     },
-  }),
-);
+  };
+});

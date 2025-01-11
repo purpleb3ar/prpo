@@ -2,16 +2,17 @@ import { WsException } from '@nestjs/websockets';
 import { AuthSocket, SocketMiddleware, TokenPayload } from './types';
 import { PinoLogger } from 'nestjs-pino';
 import { AuthService } from 'src/modules/auth/auth.service';
+import * as cookie from 'cookie';
 
 export const wsIsAuthMiddleware = (
   logger: PinoLogger,
   authService: AuthService,
+  cookieName: string,
 ): SocketMiddleware => {
   return async (socket: AuthSocket, next) => {
     try {
-      const token = Array.isArray(socket.handshake.auth.token)
-        ? socket.handshake.auth.token[0]
-        : socket.handshake.auth.token;
+      const cookies = cookie.parse(socket.handshake.headers.cookie);
+      const token = cookies[cookieName];
 
       if (!token) {
         logger.error('User tried to connect without token');
