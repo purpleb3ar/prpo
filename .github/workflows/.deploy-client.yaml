@@ -40,4 +40,4 @@ jobs:
           KUBE_CONFIG: ${{ secrets.K8S_KUBECONFIG }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
         with:
-          args: rollout restart deployment $DEPLOYMENT_NAME -n ${{ env.K8S_NAMESPACE }}
+          args: rollout restart deployment ${{ env.DEPLOYMENT_NAME }} -n ${{ env.K8S_NAMESPACE }}
