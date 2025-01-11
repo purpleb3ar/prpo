@@ -1,3 +1,3 @@
 # Client
 
-Showcases functionality of the
+Showcases functionality of the app.

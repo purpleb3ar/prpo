@@ -39,6 +39,5 @@ jobs:
         env:
           KUBE_CONFIG: ${{ secrets.K8S_KUBECONFIG }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
-        run: |
-          echo "$KUBE_CONFIG"
-          kubectl rollout restart deployment $DEPLOYMENT_NAME -n $K8S_NAMESPACE
+        with:
+          args: rollout restart deployment $DEPLOYMENT_NAME -n $K8S_NAMESPACE
