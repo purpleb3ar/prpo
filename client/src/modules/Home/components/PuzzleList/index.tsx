@@ -51,8 +51,11 @@ interface PuzzleProps {
   onClickPlay: (id: string) => void;
 }
 
-const EVENT_SOURCE_URL = "http://localhost:9002/puzzle-gen/progress";
-const PUZZLE_SERVICE_API = "http://localhost:9001/puzzles";
+// const EVENT_SOURCE_URL = "http://localhost:9002/puzzle-gen/progress";
+// const PUZZLE_SERVICE_API = "http://localhost:9001/puzzles";
+
+const EVENT_SOURCE_URL = "https://prpo.purplebear.io/puzzle-gen/progress";
+const PUZZLE_SERVICE_API = "https://prpo.purplebear.io/puzzles";
 
 const PuzzleItem: React.FC<PuzzleProps> = ({
   puzzle,
