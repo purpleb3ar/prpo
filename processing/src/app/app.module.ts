@@ -50,13 +50,19 @@ import { RedisClient } from './common/types';
     NestMinioModule.registerAsync({
       isGlobal: true,
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        endPoint: config.get<string>('minio.host'),
-        accessKey: config.get<string>('minio.accessKey'),
-        secretKey: config.get<string>('minio.secretKey'),
-        port: config.get<number>('minio.port'),
-        useSSL: false,
-      }),
+      useFactory: (config: ConfigService) => {
+        const conf = {
+          endPoint: config.get<string>('minio.host'),
+          accessKey: config.get<string>('minio.accessKey'),
+          secretKey: config.get<string>('minio.secretKey'),
+          port: config.get<number>('minio.port'),
+          useSSL: false,
+        };
+
+        console.log(conf);
+
+        return conf;
+      },
     }),
 
     RedisModule.forRootAsync({

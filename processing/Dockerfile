@@ -1,4 +1,4 @@
-FROM node:20-alpine AS development
+FROM node:20 AS development
 
 WORKDIR /usr/src/app
 
@@ -8,7 +8,7 @@ RUN npm ci
 
 COPY src ./src
 
-FROM node:20-alpine AS build
+FROM node:20 AS build
 
 WORKDIR /usr/src/app
 
@@ -24,7 +24,7 @@ ENV NODE_ENV=production
 
 RUN npm ci --omit=dev && npm cache clean --force
 
-FROM node:20-alpine AS production
+FROM node:20 AS production
 
 COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
 COPY --chown=node:node --from=build /usr/src/app/dist ./dist
