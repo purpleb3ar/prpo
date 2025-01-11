@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-depl
+  namespace: puzzle-app
+spec:
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth
+          image: registry.purplebear.io/prpo-puzzle-app-auth
+          env:
+            - name: APP_NAME
+              value: "auth-service"
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "9000"
+            - name: NATS_CLIENT_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_CLIENT_URL
+              value: "http://nats-srv:4222"
+            - name: NATS_CLUSTER_ID
+              value: "puzzle-app"
+            - name: MONGO_URI
+              value: "mongodb://auth-mongo-srv:27017/"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: puzzle-app-prod-auth-secrets
+                  key: JWT_SECRET
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: puzzle-app-prod-auth-secrets
+                  key: GOOGLE_CLIENT_ID
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: puzzle-app-prod-auth-secrets
+                  key: GOOGLE_CLIENT_SECRET
+            - name: GOOGLE_CALLBACK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: puzzle-app-prod-auth-secrets
+                  key: GOOGLE_CALLBACK_URL
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 9000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            timeoutSeconds: 1
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 9000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 2
+            successThreshold: 1
+          resources:
+            limits:
+              cpu: 500m
+            requests:
+              cpu: 100m
+
+      imagePullSecrets:
+        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-srv
+  namespace: puzzle-app
+spec:
+  selector:
+    app: auth
+  ports:
+    - name: auth
+      protocol: TCP
+      port: 3000
+      targetPort: 9000

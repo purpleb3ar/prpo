@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sync-depl
+  namespace: puzzle-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sync
+  template:
+    metadata:
+      labels:
+        app: sync
+    spec:
+      containers:
+        - name: sync
+          image: registry.purplebear.io/prpo-puzzle-app-sync
+          env:
+            - name: APP_NAME
+              value: "sync-service"
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "9003"
+            - name: NATS_CLIENT_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_CLIENT_URL
+              value: "http://nats-srv:4222"
+            - name: NATS_CLUSTER_ID
+              value: "puzzle-app"
+            - name: MONGO_URI
+              value: "mongodb://sync-mongo-srv:27017/"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: puzzle-app-prod-auth-secrets
+                  key: JWT_SECRET
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_HOST
+              value: redis-srv
+
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 9003
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            timeoutSeconds: 1
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 9003
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 2
+            successThreshold: 1
+          resources:
+            limits:
+              cpu: 500m
+            requests:
+              cpu: 100m
+
+      imagePullSecrets:
+        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sync-srv
+  namespace: puzzle-app
+spec:
+  selector:
+    app: sync
+  ports:
+    - name: sync
+      protocol: TCP
+      port: 3000
+      targetPort: 9003

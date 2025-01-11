@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: processing-depl
+  namespace: puzzle-app
+spec:
+  selector:
+    matchLabels:
+      app: processing
+  template:
+    metadata:
+      labels:
+        app: processing
+    spec:
+      containers:
+        - name: processing
+          image: registry.purplebear.io/prpo-puzzle-app-processing
+          env:
+            - name: APP_NAME
+              value: "processing-service"
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "9002"
+            - name: NATS_CLIENT_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NATS_CLIENT_URL
+              value: "http://nats-srv:4222"
+            - name: NATS_CLUSTER_ID
+              value: "puzzle-app"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: puzzle-app-prod-auth-secrets
+                  key: JWT_SECRET
+            - name: MINIO_PORT
+              value: "9000"
+            - name: MINIO_HOST
+              value: "minio-srv"
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: MINIO_ROOT_USER
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-credentials
+                  key: MINIO_ROOT_PASSWORD
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_HOST
+              value: redis-srv
+
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 9002
+            initialDelaySeconds: 3
+            periodSeconds: 5
+            timeoutSeconds: 1
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 9002
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 2
+            successThreshold: 1
+          resources:
+            limits:
+              cpu: 500m
+            requests:
+              cpu: 100m
+
+      imagePullSecrets:
+        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: processing-srv
+  namespace: puzzle-app
+spec:
+  selector:
+    app: processing
+  ports:
+    - name: processing
+      protocol: TCP
+      port: 3000
+      targetPort: 9002

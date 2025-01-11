@@ -1,5 +1,10 @@
 name: deploy-puzzle
 
+env:
+  IMAGE_NAME: prpo-puzzle-app-puzzle
+  DIRECTORY: puzzle
+  DEPLOYMENT_NAME: puzzle-depl
+
 on:
   push:
     branches:
@@ -8,17 +13,31 @@ on:
       - "puzzle/**"
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - name: Build
+        env:
+          REGISTRY_URL: ${{ vars.REGISTRY_URL }}
         run: |
-          cd puzzle && docker build -t registry.purplebear.io/prpo-puzzle-app-puzzle -f Dockerfile .
+          cd $DIRECTORY && docker build -t $REGISTRY_URL/$IMAGE_NAME -f Dockerfile .
       - name: Push
         env:
           REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
           REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          REGISTRY_URL: ${{ vars.REGISTRY_URL }}
         run: |
-          echo "$REGISTRY_PASSWORD" | docker login registry.purplebear.io -u $REGISTRY_USERNAME --password-stdin
-          docker push registry.purplebear.io/prpo-puzzle-app-puzzle
+          echo "$REGISTRY_PASSWORD" | docker login $REGISTRY_URL -u $REGISTRY_USERNAME --password-stdin
+          docker push $REGISTRY_URL/$IMAGE_NAME
+  deploy:
+    needs: build-and-push
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.K8S_KUBECONFIG }}
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE }}
+        with:
+          args: rollout restart deployment ${{ env.DEPLOYMENT_NAME }} -n ${{ env.K8S_NAMESPACE }}
